@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+
+		<title> Mandelbrot Set </title>
+
+		<style>
+
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				background: black;
+				display: flex;
+				text-align: center;
+			}
+
+			canvas {
+				border: groove;
+				border-width: 2px;
+				border-color: white;
+				margin: auto;
+				margin-top: 100px;
+				cursor: pointer;
+			}
+
+			h1 {
+				font-family: arial;
+				font-size: 20px;
+				color: white;
+				text-align: center;
+			}
+
+		</style>
+
+	</head>
+
+	<body>
+
+		<script src="gpu-browser.min.js"></script>
+		<script>
+
+			
+
+			var width = 1200;
+			var height = 800;
+
+			var x = -2;
+			var y = -1;
+
+			const size_man = 1.01;
+
+			let x_step = 1 / width*3;
+			let y_step = 1 / height*2;
+
+			var iterations = 200000;
+			const gpu = new GPU();
+
+			function draw_point(a, b, color) {
+				ctx.fillStyle = color;
+				ctx.fillRect(a, b, 1, 1);
+			}
+
+			function absolute_x(a) {
+				a = a + 2;
+				a = a * (width / 3);
+				a = Math.trunc(a);
+				return a;
+			}
+
+			function absolute_y(a) {
+				a = -a;
+				a++;
+				a = a * (height / 2);
+				a = Math.trunc(a);
+				return a;
+			}
+			function relative_x(a){
+				a = x + a*x_step;
+				return a;
+
+			}
+			function relative_y(a){
+				a = y + a*y_step;
+				return a;
+
+			}
+	
+
+			const render = gpu.createKernel(function(a,b, iter,x,y) {
+				let ar =  this.thread.x * a;
+				let ai = this.thread.y * b;
+				ar = ar /100000 + x ;
+				ai = ai /100000 + y;
+				let br = 0;
+				let bi = 0;
+				if (this.thread.x == 1280/2 && this.thread.y == 720/2){
+					this.color(1, 1, 1, 1.0);
+					return 0;
+
+				}
+				for (var i = 0; i < iter; i++) {
+					let newreal = br*br-bi*bi;
+					let newimg = br * bi * 2;
+					
+					br = newreal;
+					bi = newimg;
+					newreal = br + ar; 
+					newimg = bi + ai;
+					br = newreal;
+					bi = newimg;
+					let b = br*br + bi*bi;
+					if (b > 4){
+						let Red = 255;
+						let Green = 0;
+						let Blue = 0;
+
+						for (let j = 0 ; j < i ; j++){
+							if (Red == 255 && Blue == 0) {
+									Green +=1;
+								}
+								if (Green == 255 && Blue == 0) {
+									Red -= 1;
+								}
+								if (Red == 0 && Green == 255) {
+									Blue +=1;
+								}
+								if (Red == 0 && Blue == 255) {
+									Green -= 1;
+								}
+								if (Blue == 255 && Green == 0) {
+									Red +=1;
+								}
+								if (Red == 255 && Green == 0) {
+									Blue -= 1;
+								}
+							}
+							this.color(Red/255,Green/255,Blue/255,1.0);
+							return 0;
+						}
+					}
+					
+				this.color(0, 0, 0, 1.0);
+			})
+			.setOutput([width, height])
+			.setGraphical(true);
+
+
+			render(x_step*100000, y_step*100000, iterations,x,y);
+
+
+
+			const canv = render.canvas;
+			document.getElementsByTagName('body')[0].appendChild(canv);
+			canv.set
+			const ctx = canv.getContext("2d");
+
+			function mousepos(event){
+				const ctx = canv.getContext("2d");
+				var rect = canv.getBoundingClientRect();
+				//console.log(rect)
+				//console.log(event.clientX,event.clientY)
+				let new_height = height / size_man;
+				let new_width = width / size_man;
+				new_height = new_height/2;
+				new_width = new_width/2;
+				//console.log(relative_x(event.clientX - rect.left), relative_x(event.clientY - rect.top ));
+				
+			    x = relative_x(event.clientX + rect.left - new_width);
+				console.log(x)
+			    //y -= 0.00;
+			    x_step = x_step/size_man;
+			    y_step = y_step/size_man;
+				//console.log(x_step,y_step,x,y)
+				render(x_step*100000, y_step*100000, iterations,x,y);
+			}
+
+			canv.addEventListener('mousedown', mousepos);
+			
+
+		</script>
+
+	</body>
+
+</html>
