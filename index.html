@@ -24,7 +24,6 @@
 				border-width: 2px;
 				border-color: white;
 				margin: auto;
-				margin-top: 100px;
 				cursor: pointer;
 			}
 
@@ -52,12 +51,13 @@
 			var x = -2;
 			var y = -1;
 
-			const size_man = 1.01;
+			const size_man = 2;
 
-			let x_step = 1 / width*3;
-			let y_step = 1 / height*2;
+			let x_step = 1 / width * 3;
+			let y_step = 1 / height * 2;
+			console.log(x_step, y_step)
 
-			var iterations = 200000;
+			var iterations = 1000;
 			const gpu = new GPU();
 
 			function draw_point(a, b, color) {
@@ -94,7 +94,7 @@
 			const render = gpu.createKernel(function(a,b, iter,x,y) {
 				let ar =  this.thread.x * a;
 				let ai = this.thread.y * b;
-				ar = ar /100000 + x ;
+				ar = ar /100000 + x;
 				ai = ai /100000 + y;
 				let br = 0;
 				let bi = 0;
@@ -170,9 +170,11 @@
 				new_width = new_width/2;
 				//console.log(relative_x(event.clientX - rect.left), relative_x(event.clientY - rect.top ));
 				
-			    x = relative_x(event.clientX + rect.left - new_width);
-				console.log(x)
-			    //y -= 0.00;
+			    x = relative_x(event.clientX - rect.left - new_width);
+				//y -= y/2
+				y = relative_y(-event.clientY + rect.bottom - new_height);
+			    //y = relative_y(event.clientY - rect.bottom - new_height);
+				console.log(y, y+ y_step * height)
 			    x_step = x_step/size_man;
 			    y_step = y_step/size_man;
 				//console.log(x_step,y_step,x,y)
