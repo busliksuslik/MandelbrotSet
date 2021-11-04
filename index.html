@@ -53,7 +53,7 @@
 
 			let deltaY = 0;
 
-			const size_man = 1.01;
+			const size_man = 1.05;
 
 			let x_step = 1 / width * 3;
 			let y_step = 1 / height * 2;
@@ -161,57 +161,51 @@
 			canv.set
 			const ctx = canv.getContext("2d");
 
-			// function mousepos(event){
+			function mousepos(event){
+				let rect = canv.getBoundingClientRect();
+				//console.log(relative_x(event.clientX - rect.left), relative_y(event.clientY - rect.top ));
+				let mouseX = event.clientX - rect.left;
+				let mouseY = event.clientY - rect.top ;
+				let vectorX = x - relative_x(mouseX);
+				let vectorY = y - relative_y(mouseY);
+				console.log(relative_x(mouseX),relative_y(mouseY))
+				vectorX = vectorX/size_man;
+				vectorY = vectorY/size_man;
+
+				x = relative_x(mouseX) + vectorX;
+				y = relative_y(mouseY) + vectorY;
+				x_step = x_step/size_man;
+				y_step = y_step/size_man;
+				//console.log(x_step,y_step,x,y)
+				render(x_step*100000, y_step*100000, iterations,x,y);
+			}
+
+			// canv.addEventListener('wheel', function(event){
 			// 	const ctx = canv.getContext("2d");
-			// 	var rect = canv.getBoundingClientRect();
-			// 	while (deltaY)
-			// 	//console.log(rect)
-			// 	//console.log(event.clientX,event.clientY)
-			// 	let new_height = height / size_man;
-			// 	let new_width = width / size_man;
-			// 	new_height = new_height/2;
-			// 	new_width = new_width/2;
-			// 	//console.log(relative_x(event.clientX - rect.left), relative_x(event.clientY - rect.top ));
-			//     x = relative_x(event.clientX - rect.left - new_width);
-			// 	//y -= y/2
-			// 	y = relative_y(-event.clientY + rect.bottom - new_height);
-			//     //y = relative_y(event.clientY - rect.bottom - new_height);
-			// 	console.log(y, y+ y_step * height)
-			//     x_step = x_step/size_man;
-			//     y_step = y_step/size_man;
-			// 	//console.log(x_step,y_step,x,y)
-			// 	render(x_step*100000, y_step*100000, iterations,x,y);
-			// }
+			//  	var rect = canv.getBoundingClientRect();
+			// 	if (event.deltaY < 0)
+			// 	{
+			// 		let mouseX = event.clientX;
+			// 		let mouseY = event.clientX;
+			// 		let vectorX = x - relative_x(mouseX);
+			// 		let vectorY = y - relative_x(mouseY);
+			// 		vectorX = vectorX/size_man;
+			// 		vectorY = vectorY/size_man;
+			// 		x = x + vectorX;
+			// 		y = y + vectorY;
+			// 		x_step = x_step/size_man;
+			// 		y_step = y_step/size_man;
+			// 		//console.log(x_step,y_step,x,y)
+			// 		render(x_step*100000, y_step*100000, iterations,x,y);
+			// 	}
+			// 	else if (event.deltaY > 0)
+			// 	{
+			// 	console.log('scrolling down');
+			// 	document.getElementById('status').textContent= 'scrolling down';
+			// 	}
+			// 	});
 
-			canv.addEventListener('wheel', function(event){
-				const ctx = canv.getContext("2d");
-			 	var rect = canv.getBoundingClientRect();
-				if (event.deltaY < 0)
-				{
-					console.log(event.deltaY)
-					let new_height = height / size_man;
-					let new_width = width / size_man;
-					new_height = new_height/2;
-					new_width = new_width/2;
-					//console.log(relative_x(event.clientX - rect.left), relative_x(event.clientY - rect.top ));
-					x = relative_x(event.clientX - rect.left - new_width);
-					//y -= y/2
-					y = relative_y(-event.clientY + rect.bottom - new_height);
-					//y = relative_y(event.clientY - rect.bottom - new_height);
-					console.log(y, y+ y_step * height)
-					x_step = x_step/size_man;
-					y_step = y_step/size_man;
-					//console.log(x_step,y_step,x,y)
-					render(x_step*100000, y_step*100000, iterations,x,y);
-				}
-				else if (event.deltaY > 0)
-				{
-				console.log('scrolling down');
-				document.getElementById('status').textContent= 'scrolling down';
-				}
-				});
-
-			//canv.addEventListener('mouseover', mousepos);
+			canv.addEventListener('click', mousepos);
 			
 
 		</script>
